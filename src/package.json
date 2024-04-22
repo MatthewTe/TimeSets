@@ -1,0 +1,21 @@
+{
+  "name": "timesets",
+  "version": "0.0.1",
+  "description": " A visualization library that implements the timeseries visualization method TimeSets ",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatthewTe/TimeSets.git"
+  },
+  "author": "MatthewTe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MatthewTe/TimeSets/issues"
+  },
+  "homepage": "https://github.com/MatthewTe/TimeSets#readme"
+}
