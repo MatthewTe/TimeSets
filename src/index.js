@@ -80,6 +80,7 @@ function ConvertCiteVisTextToJSON(filepath) {
             }
 
             let CiteVObject = {
+                articleId: articleId,
                 authors: authorFormatted,
                 concepts: conceptsFormatted,
                 affiliations: affiliationsFormatted,
@@ -89,7 +90,7 @@ function ConvertCiteVisTextToJSON(filepath) {
 
             }
 
-            if (articleId == null) {
+            if (articleId !== null) {
                 processedCiteVDataset.push(CiteVObject)
             }
         })
@@ -107,3 +108,48 @@ function ConvertCiteVisTextToJSON(filepath) {
     }
 }
 
+function loadConceptSets(filepath) {
+    let rawData = fs.readFileSync(filepath, 'utf8')
+    const data = JSON.parse(rawData)
+
+    // Building set objects: 
+    const sets = new Map()
+
+    data.forEach((citation) => {
+
+        let concepts = citation.concepts
+        concepts.forEach((concept) => {
+            if (sets.has(concept)) {
+                sets.get(concept).push(citation.articleId)
+            } else {
+                sets.set(concept, [citation.articleId])
+            }
+        })
+    })
+
+    return sets
+}
+
+function createCitationMap(filepath) {
+    let rawData = fs.readFileSync(filepath, 'utf8')
+    const data = JSON.parse(rawData)
+
+    // Building set objects: 
+    const citations = new Map()
+
+    data.forEach((citation) => {
+        citations.set(
+            citation.articleId, 
+            {
+                ...
+                citation,
+            }
+        )       
+    })
+
+    return citations
+
+}
+
+// createCitationMap("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
+// loadConceptSets("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
