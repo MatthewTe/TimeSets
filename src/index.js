@@ -1,4 +1,6 @@
 import fs from 'fs';
+import {Graph} from './graphs.js';
+
 
 function ConvertCiteVisTextToJSON(filepath) {
     try {
@@ -151,5 +153,56 @@ function createCitationMap(filepath) {
 
 }
 
+function createAdjacencyList(conceptSets) {
+
+    const graph = new Graph()
+
+    let allSetKeys = [...conceptSets.keys()];
+
+    conceptSets.forEach((focusedSetElements, set, map) => {
+        
+        graph.addNode(set)
+
+        // Comparing this set with all other sets to determine intersection:
+        let elementsSet1 = set
+        let elemSetIdx = allSetKeys.indexOf(elementsSet1)
+        let otherSetKeys = allSetKeys.filter((key, keyIdx) => keyIdx !== elemSetIdx)
+        
+        // Now we have all other keys in map asside from the one we are looking at we can compare 
+        // the rest of the sets and there contents to our focused set:
+        otherSetKeys.forEach((setKey) => {
+            let otherSetElements = map.get(setKey)
+
+            // Intersect other edges with edges of focused set
+            let intersectedElements = focusedSetElements.filter(element => otherSetElements.includes(element))
+            
+            // If any intersections exist add them to the graph as edges between two verticies:
+            if (intersectedElements.length !==0) {
+                if (graph.doesNodeExist(setKey)) { 
+                    console.log(setKey)
+                    console.log(graph.doesNodeExist(setKey))
+                    // If node is already in graph, just add the edge w/ weight btween nodes:
+                    graph.addEdge(elementsSet1, setKey, intersectedElements.length)
+
+                } else {
+                    // Create node and then add weight:
+                    graph.addNode(setKey)
+                    graph.addEdge(elementsSet1, setKey, intersectedElements.length)
+
+                }
+
+            }
+
+        })
+    })
+
+    allSetKeys.forEach((set) => {
+        console.log(set)
+        console.log(graph.getNode(set))
+    })
+
+}
+
 // createCitationMap("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
-// loadConceptSets("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
+const conceptSets = loadConceptSets("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
+createAdjacencyList(conceptSets)
