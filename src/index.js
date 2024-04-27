@@ -1,5 +1,6 @@
 import fs from 'fs';
 import {Graph} from './graphs.js';
+import { createBrotliCompress } from 'zlib';
 
 
 function ConvertCiteVisTextToJSON(filepath) {
@@ -112,7 +113,8 @@ function ConvertCiteVisTextToJSON(filepath) {
 
 function loadConceptSets(filepath) {
     let rawData = fs.readFileSync(filepath, 'utf8')
-    const data = JSON.parse(rawData)
+    let data = JSON.parse(rawData)
+    data = data.slice(Math.max(data.length - 3, 0))
 
     // Building set objects: 
     const sets = new Map()
@@ -134,7 +136,8 @@ function loadConceptSets(filepath) {
 
 function createCitationMap(filepath) {
     let rawData = fs.readFileSync(filepath, 'utf8')
-    const data = JSON.parse(rawData)
+    let data = JSON.parse(rawData)
+    data = data.slice(Math.max(data.length - 20, 0))
 
     // Building set objects: 
     const citations = new Map()
@@ -165,17 +168,27 @@ function createAdjacencyList(conceptSets) {
 
         // Comparing this set with all other sets to determine intersection:
         let elementsSet1 = set
+        console.log(`Added first vertex: ${set}`)
+
         let elemSetIdx = allSetKeys.indexOf(elementsSet1)
         let otherSetKeys = allSetKeys.filter((key, keyIdx) => keyIdx !== elemSetIdx)
-        
+        console.log(`The index of this element in the keys array was ${elemSetIdx}`)       
+        console.log(`Extracted a list other sets to process`)
+        console.log(otherSetKeys)
+
         // Now we have all other keys in map asside from the one we are looking at we can compare 
         // the rest of the sets and there contents to our focused set:
         otherSetKeys.forEach((setKey) => {
+
+            console.log(`Started comparing vertex ${set} with next vertex ${setKey}`)
             let otherSetElements = map.get(setKey)
+            console.log(`The other set has the following entries:`)
+            console.log(otherSetElements)
 
             // Intersect other edges with edges of focused set
             let intersectedElements = focusedSetElements.filter(element => otherSetElements.includes(element))
-            
+            console.log(``)           
+
             // If any intersections exist add them to the graph as edges between two verticies:
             if (intersectedElements.length !==0) {
                 if (graph.doesNodeExist(setKey)) { 
@@ -203,6 +216,9 @@ function createAdjacencyList(conceptSets) {
 
 }
 
-// createCitationMap("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
+// let citations = createCitationMap("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
+// console.log(citations)
+
 const conceptSets = loadConceptSets("/Users/matthewteelucksingh/Repos/TimeSets/data/infovis-citation-data.json")
 createAdjacencyList(conceptSets)
+
